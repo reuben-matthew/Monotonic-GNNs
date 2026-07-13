@@ -1,3 +1,5 @@
+from typing import List
+
 import torch
 from dataclasses import dataclass
 
@@ -40,6 +42,10 @@ class CDGraph:
 class TraceCollector:
 
     cd_graph: CDGraph = None
+<<<<<<< Updated upstream
     fl2: torch.Tensor = None
     fl1: torch.Tensor = None
     fl0: torch.Tensor = None
+=======
+    activations: List = None #[fl0, fl1, fl2] # List of activations for each layer
+>>>>>>> Stashed changes

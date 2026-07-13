@@ -87,7 +87,11 @@ class GNN(torch.nn.Module):
         # models were trained with it.
         x = self.output(x - 10)
 
+<<<<<<< Updated upstream
         return x, features_1
+=======
+        return x, intermediates  
+>>>>>>> Stashed changes
 
     def layer_dimension(self, layer):
         return self.dimensions[layer]
@@ -132,4 +136,3 @@ class GNN(torch.nn.Module):
             return self.agg_2
         else:
             return None
-#
