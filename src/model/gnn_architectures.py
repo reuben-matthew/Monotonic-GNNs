@@ -46,24 +46,40 @@ class EC_GCNConv(MessagePassing):
 
 class GNN(torch.nn.Module):
 
-    def __init__(self, feature_dimension, num_edge_colours, aggregation_1, aggregation_2):
+    def __init__(self, feature_dimension, num_edge_colours, aggregation_1, aggregation_2, num_layers=2):
         super(GNN, self).__init__()
 
-        self.num_layers = 2 # Currently hardcoded!
-
+        #self.num_layers = 2 # Currently hardcoded!
+        self.num_layers = num_layers
         self.num_colours = num_edge_colours
+
         # From layer 0 (left) to layer L (right)
-        self.dimensions = [feature_dimension, 2*feature_dimension, feature_dimension]
-
-        self.agg_1 = aggregation_1
-        self.agg_2 = aggregation_2
-
-        self.conv1 = EC_GCNConv(self.dimensions[0], self.dimensions[1], num_edge_colours, self.agg_1)
-        self.conv2 = EC_GCNConv(self.dimensions[1], self.dimensions[2], num_edge_colours, self.agg_2)
-
-        self.lin_self_1 = torch.nn.Linear(self.dimensions[0], self.dimensions[1])
-        self.lin_self_2 = torch.nn.Linear(self.dimensions[1], self.dimensions[2])
+        #self.dimensions = [feature_dimension, 2*feature_dimension, feature_dimension]
         
+        # Expand and keep shape of dimensions for varible layers
+        self.dimensions = [feature_dimension] + [2*feature_dimension]*(self.num_layers-1) + [feature_dimension]
+
+        ## self.agg_1 = aggregation_1
+        ## self.agg_2 = aggregation_2
+
+        # apply agg_2 only to the final layer, and agg_1 to all other layers
+        self._aggregations = [aggregation_2 if i == num_layers - 1 else aggregation_1 for i in range(num_layers)]
+
+        ## self.conv1 = EC_GCNConv(self.dimensions[0], self.dimensions[1], num_edge_colours, self.agg_1)
+        ## self.conv2 = EC_GCNConv(self.dimensions[1], self.dimensions[2], num_edge_colours, self.agg_2)
+
+        ## self.lin_self_1 = torch.nn.Linear(self.dimensions[0], self.dimensions[1])
+        ## self.lin_self_2 = torch.nn.Linear(self.dimensions[1], self.dimensions[2])
+        # Build conv and lin layers
+        self.convs = torch.nn.ModuleList([
+            EC_GCNConv(self.dimensions[i], self.dimensions[i + 1],
+                       num_edge_colours, self._aggregations[i])
+            for i in range(num_layers)
+        ])
+        self.lin_selfs = torch.nn.ModuleList([
+            torch.nn.Linear(self.dimensions[i], self.dimensions[i + 1])
+            for i in range(num_layers)
+        ])
         self.output = torch.nn.Sigmoid()
 
     # One thing to keep in mind is that since this is a torch.nn.Module, you can call a GNN by writing model([yourdata])
@@ -74,20 +90,22 @@ class GNN(torch.nn.Module):
     def forward(self, data):
         x, edge_index, edge_colour = data.x, data.edge_index, data.edge_type
 
-        # Layer 1
-        x = self.lin_self_1(x) + self.conv1(x, edge_index, edge_colour)
-        x = torch.relu(x)
-        features_1 = x.detach().clone() # Detached so that it does not participate in the computation graph
+        intermediates = [x.detach().clone()] 
 
-        # Layer 2
-        x = self.lin_self_2(x) + self.conv2(x, edge_index, edge_colour)
-        # Note: this translation is irrelevant since the bias vectors are not
-        # constrained to the positive reals, therefore it isn't mentioned in
-        # the report. However, I've left it here for completeness since the
-        # models were trained with it.
-        x = self.output(x - 10)
+        for i in range(self.num_layers):
+            x = self.lin_selfs[i](x) + self.convs[i](x, edge_index, edge_colour)
+            if i < self.num_layers - 1:
+                # Hidden layer: ReLU activation; detach and save as fl_{i+1}.
+                x = torch.relu(x)
+                intermediates.append(x.detach().clone())
+            else:
+                # Note: this translation is irrelevant since the bias vectors are not
+                # constrained to the positive reals, therefore it isn't mentioned in
+                # the report. However, I've left it here for completeness since the
+                # models were trained with it.
+                x = self.output(x - 10)
 
-        return x, features_1
+        return x, intermediates  # (flL with grad, [fl0, ..., fl_{L-1}] detached)
 
     def layer_dimension(self, layer):
         return self.dimensions[layer]
