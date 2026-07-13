@@ -75,7 +75,7 @@ if __name__ == "__main__":
         cd_train_examples = external_encoder.encode_dataset(train_examples_dataset)
 
         model = GNN(feature_dimension=cd_graph.delta,num_edge_colours=cd_graph.col_size,
-                    aggregation_1=cfg.agg_function_1, aggregation_2=cfg.agg_function_2, num_layers = cfg.num_layers).to(device)
+                    aggregation_1=cfg.agg_function_1, aggregation_2=cfg.agg_function_2).to(device)
 
         # TODO: try this: use a non-uniform encoding where much like in the code of the original ICLR paper, we encode
         #  the query facts into the cd_graph that we use. This is expressive enough to support transitivity

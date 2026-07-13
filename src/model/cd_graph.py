@@ -38,9 +38,8 @@ class CDGraph:
 
 @dataclass
 class TraceCollector:
-    """
-    Collects intermediate state from a single GNN forward pass of varying layer sizes.
-    """
 
     cd_graph: CDGraph = None
-    activations: list = None  # [fl0, fl1, ..., flL]
+    fl2: torch.Tensor = None
+    fl1: torch.Tensor = None
+    fl0: torch.Tensor = None

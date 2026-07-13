@@ -15,9 +15,8 @@ class ExperimentConfig:
     data_dir: Path  # Folder with the specific dataset with all training, validation, and test data.
     exp_dir: Path  # Folder where all experiment folders are stored (we will create a new experiment folder in here)
     encoding_scheme: EncoderType  # Encoding/decoding scheme (canonical or iclr22)
-    agg_function_1: AggregationType  # Aggregation functions for all layers except final
-    agg_function_2: AggregationType  # Aggregation functions for only final layer
-    num_layers: int  # Number of GNN layers must be >= 1
+    agg_function_1: AggregationType  # Aggregation functions for layer 1
+    agg_function_2: AggregationType  # Aggregation functions for layer 2
     derivation_threshold: float # Model threshold for derivation; must be between 0 and 1
     use_dummies: bool  # Use dummy nodes during training (this is a training optimisation that sometimes helps)
     clamping: float  # Clamp weights whose absolute value is smaller than this to 0. [CURRENTLY UNSUPPORTED]
@@ -45,14 +44,6 @@ class ExperimentConfig:
             valid = " or ".join(f'"{e.value}"' for e in EncoderType)
             raise ValueError(f"encoder type not valid: please choose {valid}")
 
-        n_layers = data.get("num_layers", 2)
-        try:
-            self.num_layers = int(n_layers)
-        except (ValueError, TypeError):
-            raise ValueError(f"num_layers must be an integer, got {n_layers!r}")
-        if self.num_layers < 1:
-            raise ValueError(f"num_layers must be >= 1, got {self.num_layers}")
-        
         try:
             self.agg_function_1 = AggregationType(data["aggregation_1"])
         except ValueError:
