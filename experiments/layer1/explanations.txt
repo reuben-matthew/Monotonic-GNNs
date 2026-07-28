@@ -1,0 +1,30 @@
+('00084230', '_derivationally_related_form', '00612160')
+<_derivationally_related_form>[?X0,?X1] :- <_synset_domain_topic_of>[?X0,?X1] .
+
+('01739814', '_derivationally_related_form', '00916464')
+<_derivationally_related_form>[?X0,?X1] :- <_synset_domain_topic_of>[?X0,?X1] .
+
+('10301261', '_derivationally_related_form', '06000644')
+<_derivationally_related_form>[?X0,?X1] :- <_synset_domain_topic_of>[?X0,?X1] .
+
+('01588493', '_verb_group', '00508032')
+<_verb_group>[?X0,?X1] :- <_verb_group>[?X0,?X1] .
+
+('00508032', '_verb_group', '01588493')
+<_verb_group>[?X0,?X1] :- <_verb_group>[?X0,?X1] .
+
+('01647672', '_verb_group', '01629000')
+<_verb_group>[?X0,?X1] :- <_verb_group>[?X1,?X0] .
+
+('00443116', '_verb_group', '00443384')
+<_verb_group>[?X0,?X1] :- <_verb_group>[?X0,?X1] .
+
+('00443384', '_verb_group', '00443116')
+<_verb_group>[?X0,?X1] :- <_verb_group>[?X0,?X1] .
+
+('02700104', '_verb_group', '02657219')
+<_verb_group>[?X0,?X1] :- <_hypernym>[?X0,?X1] .
+
+('02657219', '_verb_group', '02700104')
+<_verb_group>[?X0,?X1] :- <_verb_group>[?X0,?X1] .
+

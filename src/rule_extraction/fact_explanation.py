@@ -31,7 +31,8 @@ class FactExplainer:
         self.threshold = threshold
         self.external_encoder = external_encoder
         self.internal_encoder = internal_encoder
-        self.activations = [trace.fl0,trace.fl1,trace.fl2] # Index matches layer
+        #self.activations = [trace.fl0,trace.fl1,trace.fl2] # Index matches layer
+        self.activations = trace.activations 
         self.cd_graph = trace.cd_graph
         self.node_to_index = {node: i for i, node in enumerate(self.cd_graph.node_names)}  # Helpful dictionary
         self.input_dataset = input_dataset
@@ -93,7 +94,7 @@ class FactExplainer:
     def explain_fact(self, fact: tuple[str,str,str]):
 
         fact_context = FactContext(fact, self.external_encoder, self.internal_encoder, self.node_to_index)
-        assert self.activations[2][fact_context.cd_fact_const_index][fact_context.cd_fact_pred_pos] >= self.threshold, \
+        assert self.activations[self.model.num_layers][fact_context.cd_fact_const_index][fact_context.cd_fact_pred_pos] >= self.threshold, \
             "Error: the fact to be explained is not derived by the model on this dataset."
 
         print("Computing Gamma_i")
