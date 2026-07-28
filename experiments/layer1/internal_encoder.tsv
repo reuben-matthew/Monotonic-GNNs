@@ -1,0 +1,13 @@
+UNARY	0	unary-for-_hypernym
+UNARY	1	unary-for-_derivationally_related_form
+UNARY	2	unary-for-_also_see
+UNARY	3	unary-for-_synset_domain_topic_of
+UNARY	4	unary-for-_has_part
+UNARY	5	unary-for-_verb_group
+UNARY	6	unary-for-_member_meronym
+UNARY	7	unary-for-_similar_to
+UNARY	8	unary-for-_instance_hypernym
+BINARY	0	binary-pred-1
+BINARY	1	binary-pred-2
+BINARY	2	binary-pred-3
+BINARY	3	binary-pred-4

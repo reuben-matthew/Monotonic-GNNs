@@ -1,0 +1,4 @@
+Depth (L),Test AUPRC,Test F1 (best)    ,Test Precision,Test Recall,Optimal Threshold,# Predictions,Rules extracted,Mean body length,Trivial rule %,Unique predicates (mean)
+L=1,0.9387,0.956,0.9935,0.9212,0.13,21582,10,2.0,60.0,1.0
+L=2,0.9391,0.956,0.9935,0.9212,0.02,20381,10,2.0,70.0,1.0
+L=3,0.939,0.956,0.9935,0.9212,0.02,20378,10,2.0,70.0,1.0

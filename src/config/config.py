@@ -57,6 +57,11 @@ class ExperimentConfig:
             raise ValueError(f"aggregation function not valid: please choose {valid}")
 
         try:
+            self.num_layers = int(data["num_layers"])
+        except ValueError:
+            raise ValueError(f"number of layers must be an integer, got {data['num_layers']!r}")
+        
+        try:
             self.derivation_threshold = float(data["derivation_threshold"])
         except ValueError:
             raise ValueError(f"threshold value must be a float, got {data['derivation_threshold']!r}")

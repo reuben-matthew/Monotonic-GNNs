@@ -2,7 +2,7 @@ data_dir: /Users/reubenmatthew/Documents/Royal Holloway/Dissertation/Monotonic-G
 exp_dir:  /Users/reubenmatthew/Documents/Royal Holloway/Dissertation/Monotonic-GNNs/experiments
 use_dummy_constants: false     # options: true | false
 encoding_scheme: iclr22        # options: iclr22 | canonical
-num_layers: 1                  # number of GNN layers; must be >= 1
+num_layers: 2                  # number of GNN layers; must be >= 1
 aggregation_1: max             # options: max | sum 
 aggregation_2: max             # options: max | sum 
 derivation_threshold: 0.000000001
