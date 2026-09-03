@@ -67,7 +67,7 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
             # There aren't in this case, in which case the call uses the `forward` method inside the model. And indeed,
             # the forward method extracts named attributes from its input which coincide with the names of the
             # attributes in the object `batch` that we pass as input to the instance `model` of this Module
-            output, _ = model(batch) # Ignore the second output, which are the activations in intermediate layer
+            output = model(batch)[-1] # Only last layers is needed for loss 
 
             # Target label
             label = y.to(device)

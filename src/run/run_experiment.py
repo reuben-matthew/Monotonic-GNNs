@@ -74,8 +74,8 @@ if __name__ == "__main__":
         train_examples_dataset = parse(check(dd / "train_pos.tsv", "Training positive examples"))
         cd_train_examples = external_encoder.encode_dataset(train_examples_dataset)
 
-        model = GNN(feature_dimension=cd_graph.delta,num_edge_colours=cd_graph.col_size,
-                    aggregation_1=cfg.agg_function_1, aggregation_2=cfg.agg_function_2).to(device)
+        model = GNN(feature_dimension=cd_graph.delta, num_edge_colours=cd_graph.col_size,
+                    num_layers=cfg.num_layers, aggregations=cfg.agg_functions).to(device)
 
         # TODO: try this: use a non-uniform encoding where much like in the code of the original ICLR paper, we encode
         #  the query facts into the cd_graph that we use. This is expressive enough to support transitivity
@@ -116,12 +116,11 @@ if __name__ == "__main__":
     # Explanation
     print("Computing prediction explanations...")
     explanations_file = ef / "explanations.txt"
-    sorted_predictions = sorted(predictions, key=predictions.get, reverse=True)
-    explainer = FactExplainer(device, model, cfg.derivation_threshold, trace, external_encoder, internal_encoder,
-                              test_graph_dataset)
     with open(explanations_file, 'w') as output:
-        for fact in sorted_predictions[:10]:  # TODO: replace magic number with parameter
-            rule = explainer.explain_fact(fact)
+        for fact in list(predictions)[:1]:  # TODO: replace magic number with parameter
+            explainer = FactExplainer(device, fact, model, cfg.derivation_threshold, trace, external_encoder,
+                                      internal_encoder, args.minimal)
+            rule = explainer.rule
             output.write("{}\n".format(fact))
             output.write(rule + '\n')
     output.close()

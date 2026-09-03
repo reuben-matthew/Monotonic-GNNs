@@ -17,8 +17,8 @@ def write_config(tmp_path, **overrides):
         "data_dir": str(data_dir),
         "exp_dir": str(exp_dir),
         "encoding_scheme": "canonical",
-        "aggregation_1": "max",
-        "aggregation_2": "sum",
+        "num_layers": 2,
+        "aggregations": ["max", "sum"],
         "derivation_threshold": 0.5,
         "clamping": 0.1,
         "use_dummy_constants": True,
@@ -41,8 +41,8 @@ def test_valid_config_loads(tmp_path):
     cfg = ExperimentConfig(str(config_file))
 
     assert cfg.encoding_scheme == EncoderType.CANONICAL
-    assert cfg.agg_function_1 == AggregationType.MAX
-    assert cfg.agg_function_2 == AggregationType.SUM
+    assert cfg.num_layers == 2
+    assert cfg.agg_functions == [AggregationType.MAX, AggregationType.SUM]
     assert cfg.derivation_threshold == 0.5
     assert cfg.clamping == 0.1
     assert cfg.use_dummies is True
@@ -72,7 +72,7 @@ def test_invalid_encoder_type_raises(tmp_path):
 def test_invalid_aggregation_type_raises(tmp_path):
     config_file = write_config(
         tmp_path,
-        aggregation_1="average",
+        aggregations="average",
     )
 
     with pytest.raises(ValueError, match="aggregation function not valid"):
@@ -106,4 +106,15 @@ def test_negative_clamping_raises(tmp_path):
     )
 
     with pytest.raises(ValueError, match="clamping value must be non-negative"):
+        ExperimentConfig(str(config_file))
+        
+
+def test_aggregations_length_mismatch_raises(tmp_path):
+    config_file = write_config(
+        tmp_path,
+        num_layers=3,
+        aggregations=["max", "max"],
+    )
+
+    with pytest.raises(ValueError, match="one entry per layer"):
         ExperimentConfig(str(config_file))

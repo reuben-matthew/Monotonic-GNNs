@@ -58,8 +58,8 @@ First edit `./src/config/config.yaml` to select your preferred configuration. Th
 - exp_dir: the path of the folder where the folder with experiment results for this benchmar will be stored. We recommend using `./experiments`.
 - use_dummy_constants: parameter set to `true` or `false` to introduce dummy constants in the training graph to disincentivise false positives. 
 - encoding_scheme: currently only `canonical` or `iclr22` are supported, corresponding to the canonical encoding or the encoding described in our ICLR22 paper [1]
-- aggregation_1: aggregation function in the first layer; currently supporting `max` or `sum` only
-- aggregation_2: aggregation function in the second layer; currently supporting `max` or `sum` only
+- num_layer : the depth of the network, '1', '2', or '3'.
+- aggregations: aggregation functions with an entry for each layer sepcified; currently supporting `max` or `sum` only
 - derivation_threshold: threshold \theta from the papers, applied after the last layer to decide which facts are derived
 - non_negative_weights: parameter set to `true` or `false` to impose that the learned matrices of the model have non-negative weights. 
 - clamping: [FEATURE CURRENTLY UNSUPPORTED] 
