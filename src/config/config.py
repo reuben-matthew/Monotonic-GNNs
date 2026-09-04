@@ -22,6 +22,8 @@ class ExperimentConfig:
     clamping: float  # Clamp weights whose absolute value is smaller than this to 0. [CURRENTLY UNSUPPORTED]
     non_negative_weights: bool  # Use only non-negative weights in the model's matrices.
     target_predicate: str  # if not null then train and explain on the nodes. Null includes all 
+    learning_rate: float  # Learning rate for training
+    early_stopping_lag: int  # Number of epochs to wait for improvement before stopping training
 
     # TODO: factor out boilerplate (use utils.check or define a similar one)
     def __init__(self, config_path: str):
@@ -80,4 +82,6 @@ class ExperimentConfig:
         self.use_dummies = data["use_dummy_constants"]
         self.non_negative_weights = data["non_negative_weights"]
         self.target_predicate = data.get("target_predicate", None)
+        self.learning_rate = float(data.get("learning_rate", 0.01))
+        self.early_stopping_lag = int(data.get("early_stopping_lag", 200))
 

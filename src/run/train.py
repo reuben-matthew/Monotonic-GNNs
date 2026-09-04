@@ -52,7 +52,7 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
     train_loader = DataLoader(dataset=[train_data.to(device)], batch_size=1)
 
     # Select Adam as the optimisation algorithm
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.learning_rate, weight_decay=5e-4)
     # optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
     checkpoints_folder = experiment_folder / "checkpoints"
@@ -116,12 +116,15 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
     # only achieving higher losses than the lowest one recorded, then stop early.
     min_loss = None
     num_bad_iterations = 0
-    max_num_bad = 50
+    max_num_bad = cfg.early_stopping_lag
 
     print("Training model")
+    loss_logger = open(experiment_folder / "train_loss.tsv", "w")
+    loss_logger.write("epoch\tloss\n")
     # Train for a maximum of 20000 epochs, but expect to stop early
     for epoch in range(20000): # TODO: include these numbers in the experiment configuration
         loss = train_epoch()
+        loss_logger.write("{}\t{}\n".format(epoch, loss))
         if min_loss is None: min_loss = loss
         if epoch % divisor == 0:
             print('Epoch: {:03d}, Loss: {:.5f}'.
@@ -137,5 +140,6 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
             num_bad_iterations = 0
             min_loss = loss
 
+    loss_logger.close()
     torch.save(model, experiment_folder / "model.pt")
 
