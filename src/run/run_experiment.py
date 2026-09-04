@@ -75,8 +75,9 @@ if __name__ == "__main__":
         cd_train_examples = external_encoder.encode_dataset(train_examples_dataset)
         # Negative training examples for ADNI are used and only when the target predicate is set, not needed for WN18RRv1
         train_neg_examples_dataset = parse(check(dd / "train_neg.tsv", "Training negative examples"))
-        cd_train_neg_examples = external_encoder.encode_dataset(train_neg_examples_dataset)
-
+        cd_train_neg_examples = []
+        if (dd / "train_neg.tsv").exists():
+            cd_train_neg_examples = external_encoder.encode_dataset(parse(dd / "train_neg.tsv"))
 
         model = GNN(feature_dimension=cd_graph.delta, num_edge_colours=cd_graph.col_size,
                     num_layers=cfg.num_layers, aggregations=cfg.agg_functions).to(device)
@@ -132,6 +133,7 @@ if __name__ == "__main__":
     explanations_file = ef / "explanations.txt"
     with open(explanations_file, 'w') as output:
         explain = [f for f in predictions if cfg.target_predicate is None or (f[1] == TYPE_PRED and f[2] == cfg.target_predicate)]
+        explain = sorted(explain, key=lambda f: -predictions[f]) # We want highest scoring fact firstcd
         for fact in list(predictions)[:1]:  # TODO: replace magic number with parameter
             explainer = FactExplainer(device, fact, model, cfg.derivation_threshold, trace, external_encoder,
                                       internal_encoder, args.minimal)

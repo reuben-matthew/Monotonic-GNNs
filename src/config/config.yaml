@@ -7,4 +7,4 @@ aggregations: [max, max]    # one entry per layer specified options:max|sum
 derivation_threshold: 0.0001
 non_negative_weights: true       # options: true | false
 clamping: 0 
-target_predicate: postive # for ADNI this is the predcate that the loss and explanations should be restricted to. Null otherwise
+target_predicate: positive # for ADNI this is the predcate that the loss and explanations should be restricted to. Null otherwise

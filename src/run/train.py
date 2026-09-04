@@ -24,7 +24,7 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
     if cfg.target_predicate is not None:
         loss_picker = torch.zeros_like(cd_graph.features)
         target_pred_pos = internal_encoder.unary_pred_position_dict[cfg.target_predicate]
-        for s, p, o in train_examples:
+        for s, p, o in (train_negatives or []):
             if p == TYPE_PRED and s in cd_graph.node_names and o == cfg.target_predicate:
                 loss_picker[cd_graph.node_names.index(s)][target_pred_pos] = 1
 
@@ -34,12 +34,12 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
             n_ind = cd_graph.node_names.index(s)
             train_y[n_ind][internal_encoder.unary_pred_position_dict[o]] = 1
             if cfg.target_predicate is not None and o == cfg.target_predicate:
-                loss_picker[n_ind][internal_encoder.unary_pred_position_dict[o]] = 0
+                loss_picker[n_ind][internal_encoder.unary_pred_position_dict[o]] = 1
         else:
             # We drop cd_examples mentioning new constants. Note that if we use ICLR as external decoder, this means
             # dropping all facts of the form R(a,b) where a and b never occur together in the training set.
             examples_excluded += 1
-    print ("Loss computed on {} examples, {} examples excluded".format(int(loss_picker.sum()), int((train_y * loss_picker).sum())))
+    print ("Loss for {} examples, {} examples excluded".format(int(loss_picker.sum()), examples_excluded))
 
     # Convert to PyTorch Geometric Data objects
     # Data: "A plain old python object modeling a single graph with various (optional) attributes"
@@ -98,7 +98,7 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
             else:
                 weight = torch.tensor([0.5, 5.0]).to(device)
             weight_ = weight[y.data.long()].view_as(y)
-            loss = loss * weight_
+            loss = loss * weight_ * batch.mask
             # Use sum reduction on loss, backpropagate
             loss.sum().backward()
             optimizer.step()
