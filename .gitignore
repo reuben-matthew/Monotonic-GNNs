@@ -21,5 +21,8 @@ dist/
 .vscode/
 .idea/
 *.swp
-data_v10/
-seed_81/
+
+#filders
+experiments/
+data/
+*.docx
