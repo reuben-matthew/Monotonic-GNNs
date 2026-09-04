@@ -74,7 +74,6 @@ if __name__ == "__main__":
         train_examples_dataset = parse(check(dd / "train_pos.tsv", "Training positive examples"))
         cd_train_examples = external_encoder.encode_dataset(train_examples_dataset)
         # Negative training examples for ADNI are used and only when the target predicate is set, not needed for WN18RRv1
-        train_neg_examples_dataset = parse(check(dd / "train_neg.tsv", "Training negative examples"))
         cd_train_neg_examples = []
         if (dd / "train_neg.tsv").exists():
             cd_train_neg_examples = external_encoder.encode_dataset(parse(dd / "train_neg.tsv"))

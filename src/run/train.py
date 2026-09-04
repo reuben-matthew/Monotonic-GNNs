@@ -131,10 +131,13 @@ def train(cfg: ExperimentConfig, device, internal_encoder: CanonicalEncoderDecod
                   format(epoch, loss))
             if epoch % 1000 == 0: # Save checkpoint for each 1000 epochs
                 torch.save(model, checkpoints_folder / "{}_Epoch{}.pt".format("model", epoch))
-        if loss >= min_loss:
+        if loss/ max(int(loss_picker.sum()), 1) < 0.0001: # stop if loss is very low
+            print("Stopping early, loss is very low")
+            break
+        if loss >= min_loss * 0.99: # stop if loss doesnt improve by 1% of best
             num_bad_iterations += 1
             if num_bad_iterations > max_num_bad:
-                print("Stopping early")
+                print("Stopping early, no improvement")
                 break
         else:
             num_bad_iterations = 0

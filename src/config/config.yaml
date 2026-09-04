@@ -8,3 +8,5 @@ derivation_threshold: 0.0001
 non_negative_weights: true       # options: true | false
 clamping: 0 
 target_predicate: positive # for ADNI this is the predcate that the loss and explanations should be restricted to. Null otherwise
+learning_rate: 0.001 # set to 0.01 to match with ICLR22 paper is too high for ADNI data
+early_stopping_lag: 200 # num epochs to see without any improvement in loss before stopping training
