@@ -21,6 +21,7 @@ class ExperimentConfig:
     use_dummies: bool  # Use dummy nodes during training (this is a training optimisation that sometimes helps)
     clamping: float  # Clamp weights whose absolute value is smaller than this to 0. [CURRENTLY UNSUPPORTED]
     non_negative_weights: bool  # Use only non-negative weights in the model's matrices.
+    target_predicate: str  # if not null then train and explain on the nodes. Null includes all 
 
     # TODO: factor out boilerplate (use utils.check or define a similar one)
     def __init__(self, config_path: str):
@@ -78,4 +79,5 @@ class ExperimentConfig:
 
         self.use_dummies = data["use_dummy_constants"]
         self.non_negative_weights = data["non_negative_weights"]
+        self.target_predicate = data.get("target_predicate", None)
 

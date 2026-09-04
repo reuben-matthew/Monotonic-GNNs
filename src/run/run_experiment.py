@@ -7,7 +7,7 @@ from src.encodings.noncanonical.identity import IdentityEncoderDecoder
 from src.encodings.noncanonical.iclr22 import ICLREncoderDecoder
 from src.config.config import EncoderType, ExperimentConfig
 from src.model.gnn_transformation import apply_gnn_transformation
-from src.utils.utils import check, load_predicates
+from src.utils.utils import check, load_predicates, TYPE_PRED
 from src.run.train import train
 from src.run.compute_metrics import compute_metrics, best_f1_threshold
 from src.rule_extraction.fact_explanation import FactExplainer
@@ -73,6 +73,10 @@ if __name__ == "__main__":
         cd_graph = internal_encoder.encode_dataset(cd_dataset)
         train_examples_dataset = parse(check(dd / "train_pos.tsv", "Training positive examples"))
         cd_train_examples = external_encoder.encode_dataset(train_examples_dataset)
+        # Negative training examples for ADNI are used and only when the target predicate is set, not needed for WN18RRv1
+        train_neg_examples_dataset = parse(check(dd / "train_neg.tsv", "Training negative examples"))
+        cd_train_neg_examples = external_encoder.encode_dataset(train_neg_examples_dataset)
+
 
         model = GNN(feature_dimension=cd_graph.delta, num_edge_colours=cd_graph.col_size,
                     num_layers=cfg.num_layers, aggregations=cfg.agg_functions).to(device)
@@ -80,7 +84,7 @@ if __name__ == "__main__":
         # TODO: try this: use a non-uniform encoding where much like in the code of the original ICLR paper, we encode
         #  the query facts into the cd_graph that we use. This is expressive enough to support transitivity
         train(cfg=cfg, device=device, internal_encoder=internal_encoder, model=model, cd_graph=cd_graph,
-              train_examples=cd_train_examples, experiment_folder=ef)
+              train_examples=cd_train_examples, train_negatives=cd_train_neg_examples, experiment_folder=ef)
 
     # Validation
     print("Validating...")
@@ -127,6 +131,7 @@ if __name__ == "__main__":
     print("Computing prediction explanations...")
     explanations_file = ef / "explanations.txt"
     with open(explanations_file, 'w') as output:
+        explain = [f for f in predictions if cfg.target_predicate is None or (f[1] == TYPE_PRED and f[2] == cfg.target_predicate)]
         for fact in list(predictions)[:1]:  # TODO: replace magic number with parameter
             explainer = FactExplainer(device, fact, model, cfg.derivation_threshold, trace, external_encoder,
                                       internal_encoder, args.minimal)
