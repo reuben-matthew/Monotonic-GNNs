@@ -37,7 +37,7 @@ class BasicExplanation:
                     neighbours = colour_edges[:, colour_edges[1] == self.var_const_idx[var]][0].tolist()
                     if not neighbours:
                         continue
-                    neighbour_vectors = np.array([fe.activations[l - 1][neighbour] for neighbour in neighbours])
+                    neighbour_vectors = np.array([fe.activations[l - 1][neighbour].cpu() for neighbour in neighbours])
                     for j in backpropagate_relevance(self.var_layer_mask[(var,l)],
                                                      fe.model.matrix_B(l, colour)
                                                      ).elements():

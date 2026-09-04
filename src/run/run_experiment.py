@@ -9,7 +9,7 @@ from src.config.config import EncoderType, ExperimentConfig
 from src.model.gnn_transformation import apply_gnn_transformation
 from src.utils.utils import check, load_predicates
 from src.run.train import train
-from src.run.compute_metrics import compute_metrics
+from src.run.compute_metrics import compute_metrics, best_f1_threshold
 from src.rule_extraction.fact_explanation import FactExplainer
 from src.model.gnn_architectures import GNN
 from src.model.cd_graph import CDGraph, TraceCollector
@@ -88,7 +88,8 @@ if __name__ == "__main__":
     predictions = apply_gnn_transformation(valid_graph_dataset, external_encoder, internal_encoder, model,
                                                  cfg.derivation_threshold, device) # Ignore activations, don't save.
     compute_metrics(predictions, dd/"valid_pos.tsv", dd/"valid_neg.tsv", ef/"valid_metrics.txt")
-    # TODO: print_best_threshold
+    best_threshold, best_f1 = best_f1_threshold(ef / "valid_metrics.txt")
+    print(f"Threshold selected on validation: {best_threshold} (validation F1 {best_f1:.4f})")
 
     # Test
     print("Testing...")
@@ -98,6 +99,15 @@ if __name__ == "__main__":
                                                  cfg.derivation_threshold, device, trace_collector=trace)
     compute_metrics(predictions, dd/"test_pos.tsv", dd/"test_neg.tsv", ef/"test_metrics.txt")
 
+    #Log best threshold from validation set
+    with open(ef / "test_at_valid_threshold.txt", "w") as f:
+        f.write("Threshold\tPrecision\tRecall\tAccuracy\tF1 Score\n")
+        for line in open(ef / "test_metrics.txt"):
+            parts = line.strip().split("\t")
+            if len(parts) == 5 and parts[0] != "Threshold" and float(parts[0]) == best_threshold:
+                f.write(line)
+                break
+    
     # Save output
     derivations_file = ef / "predicted_triples.tsv"
     derivations_file_scored = ef / "predicted_triples_scored.tsv"

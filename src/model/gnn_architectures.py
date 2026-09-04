@@ -104,12 +104,12 @@ class GNN(torch.nn.Module):
 
     def matrix_B(self, layer, colour):
         if 1 <= layer <= self.num_layers:
-            return self.lin_selfs[layer - 1].weights[colour].detach()
+            return self.convs[layer - 1].weights[colour].detach()
         else:
             return None 
 
     def bias(self, layer):
-        if 1 <= layer <= self.num_layers:
+        if 1 <= layer < self.num_layers:
             return self.lin_selfs[layer - 1].bias.detach()
         elif layer == self.num_layers:
             return self.lin_selfs[layer - 1].bias.detach() - 10
@@ -126,6 +126,6 @@ class GNN(torch.nn.Module):
 
     def aggregation_function(self, layer):
         if 1 <= layer <= self.num_layers:
-            return self.aggs[layer - 1]
+            return self.agg_functions[layer - 1]
         else:
             return None

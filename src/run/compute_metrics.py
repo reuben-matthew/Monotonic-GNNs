@@ -50,6 +50,17 @@ def f1score(tp, fp, fn):
 def auprc(precision_vector, recall_vector):
     return -1 * trapz(precision_vector, recall_vector)
 
+def best_f1_threshold(metrics_file):
+    best_t, best_f1 = None, -1.0
+    for line in open(metrics_file):
+        parts = line.strip().split("\t")
+        if len(parts) == 5 and parts[0] != "Threshold":
+            t, f1 = float(parts[0]), float(parts[4])
+            if f1 == f1 and f1 > best_f1: #Skips Nan f1 scores
+                best_t, best_f1 = t, f1
+
+    return best_t, best_f1 
+
 
 def compute_metrics(predictions, positive_examples, negative_examples, metrics_file):
 
@@ -92,7 +103,7 @@ def compute_metrics(predictions, positive_examples, negative_examples, metrics_f
             f.write("{}\t{}\t{}\t{}\t{}\n".format(threshold, precision(tp, fp),
                                                   recall(tp, fn), accuracy(tp, fp, tn, fn),
                                                   f1score(tp, fp, fn)))
-            recall_vector.append(recall(tp, fp))
+            recall_vector.append(recall(tp, fn))
             precision_vector.append(precision(tp, fp))
         # Add extremal points for AUC. This ensures a perfect classifier has AUC 1, a random classifier has AUC 0.5,
         # and an `always wrong' classifier has an AUC 0. Without this, a perfect classifier would have a score of 0!
