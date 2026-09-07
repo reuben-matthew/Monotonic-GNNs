@@ -133,7 +133,7 @@ if __name__ == "__main__":
     with open(explanations_file, 'w') as output:
         explain = [f for f in predictions if cfg.target_predicate is None or (f[1] == TYPE_PRED and f[2] == cfg.target_predicate)]
         explain = sorted(explain, key=lambda f: -predictions[f]) # We want highest scoring fact firstcd
-        for fact in list(predictions)[:1]:  # TODO: replace magic number with parameter
+        for fact in explain[:1]:  # TODO: replace magic number with parameter
             explainer = FactExplainer(device, fact, model, cfg.derivation_threshold, trace, external_encoder,
                                       internal_encoder, args.minimal)
             rule = explainer.rule

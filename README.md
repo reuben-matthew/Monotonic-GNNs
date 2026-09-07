@@ -2,7 +2,6 @@ This file explains how to use our implementation of monotonic GNNs. Please check
 
 # MGNNs 
 
-This code requires [PyTorch](https://pytorch.org/) and [PyTorch Geometric](https://github.com/rusty1s/pytorch_geometric); it was tested with Python 3.9.6, PyTorch v2.8.0 and PyTorch Geometric v2.6.1. 
 
 ## Directory Structure
 
@@ -57,17 +56,27 @@ First edit `./src/config/config.yaml` to select your preferred configuration. Th
 - data_dir: the path of the folder that the benchmark/dataset for this experiment (usually this is a subfolder of ./data)
 - exp_dir: the path of the folder where the folder with experiment results for this benchmar will be stored. We recommend using `./experiments`.
 - use_dummy_constants: parameter set to `true` or `false` to introduce dummy constants in the training graph to disincentivise false positives. 
-- encoding_scheme: currently only `canonical` or `iclr22` are supported, corresponding to the canonical encoding or the encoding described in our ICLR22 paper [1]
+- encoding_scheme: currently only `canonical` or `iclr22` are supported icl22 should be used for the WN18RRv1 dataset and canonical for data_v10 and seed_81
 - num_layer : the depth of the network, '1', '2', or '3'.
 - aggregations: aggregation functions with an entry for each layer sepcified; currently supporting `max` or `sum` only
 - derivation_threshold: threshold \theta from the papers, applied after the last layer to decide which facts are derived
 - non_negative_weights: parameter set to `true` or `false` to impose that the learned matrices of the model have non-negative weights. 
-- clamping: [FEATURE CURRENTLY UNSUPPORTED] 
+- clamping: [FEATURE CURRENTLY UNSUPPORTED]
+- target_predicate: for data_v10 and seed_81 this is the predcate that the loss and explanations should be restricted to. Null otherwise
+- learning_rate: this is set to 0.01 to match with ICLR22 paper is too high for data_v10 and seed_81 data
+- early_stopping_lag: the number of epochs to execute without any improvement in loss before stopping training 
+
+Install the dependencies needed via the requirement.txt file by running
+
+```bash
+  pip install -r requirements.txt
+```
+
 
 To train and apply a GNN model for a given benchmark with the structure described in the previous section, please open a terminal in the root directory and run 
 
 ```bash
-  python run_experiment.py ./src/config/config.yaml
+  python -m src.run.run_experiment.py ./src/config/config.yaml
 ```
 
 This will create a new folder in `./experiments` labelled by the dataset name (the name of the folder whose path is data_dir) followed by the timestamp of the experiment start. The experiment should create the following files:
@@ -94,3 +103,5 @@ experiment_name
 - File `predicted_triples_scored.tsv` contains a prediction in each line followed by its "score" (i.e. the corresponding value in the last layer of the GNN application)
 - File `predicted_triples.tsv` contains the same but without the scores.
 - Files `test_metrics.txt` and `valid_metrics.txt` contain the classification metrics obtained by applying the model on the testing and validation datasets, respectively, over a variety of fixed thresholds.
+- Folder `analysis` contains the jupyter notebooks needed to analyse  the model and to plot the evaluation metrics.
+

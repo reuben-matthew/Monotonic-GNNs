@@ -1,5 +1,5 @@
-data_dir: /Users/reubenmatthew/Documents/Royal Holloway/Dissertation/mgnns/data/link_prediction/seed81
-exp_dir:  /Users/reubenmatthew/Documents/Royal Holloway/Dissertation/mgnns/experiments
+data_dir: <path_to_root>/MGNN/data/seed_81
+exp_dir:  <path_to_root>/MGNN/experiments
 use_dummy_constants: false   # options: true | false
 encoding_scheme: canonical # options: iclr22 | canonical
 num_layers : 2  # options 1|2|3
@@ -7,6 +7,6 @@ aggregations: [max, max]    # one entry per layer specified options:max|sum
 derivation_threshold: 0.0001
 non_negative_weights: true       # options: true | false
 clamping: 0 
-target_predicate: positive # for ADNI this is the predcate that the loss and explanations should be restricted to. Null otherwise
+target_predicate: positive # options: positive|null # for ADNI this is the predcate that the loss and explanations should be restricted to. Null otherwise
 learning_rate: 0.001 # set to 0.01 to match with ICLR22 paper is too high for ADNI data
 early_stopping_lag: 200 # num epochs to see without any improvement in loss before stopping training
